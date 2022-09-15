@@ -286,6 +286,6 @@ for submission in subreddit.search('flair:"Review"',sort='new'):
         pp.pprint(submission.url)
         pp.pprint(text_reply)
         comment = submission.reply(body=text_reply)
-        # comment.mod.distinguish(sticky=True)
+        comment.mod.distinguish(sticky=True)
         
         max_utc = submission.created_utc
