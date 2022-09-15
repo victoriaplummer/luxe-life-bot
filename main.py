@@ -1,5 +1,4 @@
 import praw
-from dotenv import load_dotenv  # To access environment variables from a .env file
 from pyairtable import Base
 import pprint
 from datetime import date
@@ -12,7 +11,6 @@ from operator import indexOf
 pp = pprint.PrettyPrinter(indent=4)
 
 # Get Variables from .env
-load_dotenv()
 REDDIT_CLIENT_ID = os.environ.get('REDDIT_CLIENT_ID')
 REDDIT_CLIENT_SECRET = os.environ.get('REDDIT_CLIENT_SECRET')
 REDDIT_PASSWORD = os.environ.get('REDDIT_PASSWORD')
@@ -65,7 +63,7 @@ style_df = pd.json_normalize(df.fields)
 styles_and_aliases = style_df['Name & Aliases'].to_list()
 
 ### GET POST DETAILS ####
-for submission in subreddit.search('flair:"Review"',sort='new'):
+for submission in subreddit.search('flair:"Review"',sort='new').stream:
 
     if submission.created_utc > max_utc:
 
