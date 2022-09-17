@@ -7,10 +7,12 @@ import os, re, json, time, requests
 import pandas as pd
 import pytablewriter as ptw
 from operator import indexOf
+from dotenv import load_dotenv
 
 pp = pprint.PrettyPrinter(indent=4)
 
 # Get Variables from .env
+load_dotenv()
 REDDIT_CLIENT_ID = os.environ.get('REDDIT_CLIENT_ID')
 REDDIT_CLIENT_SECRET = os.environ.get('REDDIT_CLIENT_SECRET')
 REDDIT_PASSWORD = os.environ.get('REDDIT_PASSWORD')
@@ -63,9 +65,9 @@ style_df = pd.json_normalize(df.fields)
 styles_and_aliases = style_df['Name & Aliases'].to_list()
 
 ### GET POST DETAILS ####
-for submission in subreddit.search('flair:"Review"',sort='new').stream:
+for submission in subreddit.stream.submissions():
 
-    if submission.created_utc > max_utc:
+    if submission.created_utc > max_utc and "Review" in submission.link_flair_text:
 
         print(submission.title)
 
@@ -75,9 +77,10 @@ for submission in subreddit.search('flair:"Review"',sort='new').stream:
             for x in object_array:
 
                 names = x.split(', ')
-
                 for name in names:
-                    hasName = f' {name.lower()} ' in title_lower+' '
+                    regex = '(\s|^)' + re.escape(name.lower()) + '(\s|$)'
+                    hasName = re.search(regex, title_lower)
+                    print(hasName)
                     if hasName:
                         
                         if len(name) > 2:
@@ -196,8 +199,9 @@ for submission in subreddit.search('flair:"Review"',sort='new').stream:
         # Get All Imgur Links in Post
         imgurClientId = '38d3368aaca99ca'
         imgurClientSecret = '989522a01a9364c8b40d80dbc052a89a14fe957b'
-        albumRegex = "https:\/\/imgur.com\/.*?(?=\]|\))"
+        albumRegex = "https:\/\/imgur.com\/\w\/(\w+|\d+)"
         albumMatch = re.search(albumRegex, submission.selftext)
+        print(albumMatch)
 
         if albumMatch:
             imgur_url = albumMatch.group(0)
@@ -273,7 +277,7 @@ for submission in subreddit.search('flair:"Review"',sort='new').stream:
         prefill = prefill+f"&prefill_Review={record_id}"
         reply_table_headers = "|".join(reply_table.keys())
         reply_table_divider = "".join(["|:-" for x in list(reply_table.keys())])
-        reply_table_values = [str(x) if x is not None in list(reply_table.values()) else " " for x in list(reply_table.values())]
+        reply_table_values = [str(x) if x is not None in list(reply_table.values()) else " - " for x in list(reply_table.values())]
         reply_table_values = "|".join(reply_table_values)
         reply_table = "\n".join([reply_table_headers,reply_table_divider, reply_table_values])
         print(reply_table)
@@ -285,5 +289,3 @@ for submission in subreddit.search('flair:"Review"',sort='new').stream:
         pp.pprint(text_reply)
         comment = submission.reply(body=text_reply)
         comment.mod.distinguish(sticky=True)
-        
-        max_utc = submission.created_utc
