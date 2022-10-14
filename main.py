@@ -173,9 +173,12 @@ def get_reddit_post(submission):
 
                             # If an item is a "Score" get the numerical value. Calibrate for values > 10
                             if "score" in item[1].keys():
-
-                                my_str = my_obj[item[0]].replace(",",".")
-                                my_obj[item[0]] = 10 if float(my_str) > 10 else float(my_str)
+                                
+                                try:
+                                    my_str = my_obj[item[0]].replace(",",".")
+                                    my_obj[item[0]] = 10 if float(my_str) > 10 else float(my_str)
+                                except ValueError:
+                                    break
 
                         # Else, pull the find sbustring
                         else:
