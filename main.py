@@ -305,7 +305,7 @@ for submission in subreddit.stream.submissions():
     try:
         get_reddit_post(submission)
     
-    except PrawcoreException:
+    except ConnectionError:
         load_reddit()
         get_reddit_post(submission)
 
