@@ -33,8 +33,7 @@ reviews_table = base.all('REVIEWS', fields='created_utc')
 df = pd.DataFrame(reviews_table)
 reviews_df = pd.json_normalize(df.fields)
 utcs = reviews_df['created_utc'].to_list()
-# max_utc = max(utcs)
-max_utc = 1669018190
+max_utc = max(utcs)
 
 # LOAD REDDIT & SUBREDDIT
 
